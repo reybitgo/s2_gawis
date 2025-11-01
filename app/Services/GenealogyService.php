@@ -91,7 +91,7 @@ class GenealogyService
         $earnings = DB::table('transactions')
             ->select(DB::raw('JSON_UNQUOTE(JSON_EXTRACT(metadata, "$.buyer_id")) as buyer_id'), DB::raw('SUM(amount) as total_earnings'))
             ->where('user_id', $recipientId)
-            ->where('source_type', $earningsType)
+            ->where('type', $earningsType)
             ->whereIn(DB::raw('JSON_UNQUOTE(JSON_EXTRACT(metadata, "$.buyer_id"))'), $downlineIds)
             ->groupBy('buyer_id')
             ->pluck('total_earnings', 'buyer_id')

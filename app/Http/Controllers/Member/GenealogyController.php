@@ -36,7 +36,7 @@ class GenealogyController extends Controller
     public function showMlm()
     {
         $user = Auth::user();
-        $data = $this->genealogyService->getGenealogyTree($user, 'mlm');
+        $data = $this->genealogyService->getGenealogyTree($user, 'mlm_commission');
 
         $breadcrumbs = [
             ['title' => 'Genealogy'],
