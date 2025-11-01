@@ -17,7 +17,7 @@
         <link
             rel="shortcut icon"
             type="image/x-icon"
-            href="{{ asset('frontend/images/favicon.png') }}"
+            href="{{ asset('frontend/images/favicon.png') }}?v={{ time() }}"
         />
         <!-- Google Fonts Css-->
         <link rel="preconnect" href="https://fonts.googleapis.com/" />
