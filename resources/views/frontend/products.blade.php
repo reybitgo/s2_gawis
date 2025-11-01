@@ -52,7 +52,7 @@
                         <option value="{{ route('frontend.our-products', request()->except('category')) }}"
                                 {{ !request('category') ? 'selected' : '' }}>All Categories</option>
                         @foreach($categories as $cat)
-                            <option value="{{ route('frontend.our-products', ['category' => $cat] + request()->except('category')) }}"
+                            <option value="{{ route('frontend.our-products', array_merge(request()->except('category'), ['category' => $cat])) }}"
                                     {{ request('category') == $cat ? 'selected' : '' }}>{{ $cat }}</option>
                         @endforeach
                     </select>
@@ -61,13 +61,13 @@
                     <select class="form-select" onchange="location = this.value;">
                         <option value="{{ route('frontend.our-products', request()->except('sort')) }}"
                                 {{ !request('sort') ? 'selected' : '' }}>Sort by Default</option>
-                        <option value="{{ route('frontend.our-products', ['sort' => 'price_asc'] + request()->except('sort')) }}"
+                        <option value="{{ route('frontend.our-products', array_merge(request()->except('sort'), ['sort' => 'price_asc'])) }}"
                                 {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
-                        <option value="{{ route('frontend.our-products', ['sort' => 'price_desc'] + request()->except('sort')) }}"
+                        <option value="{{ route('frontend.our-products', array_merge(request()->except('sort'), ['sort' => 'price_desc'])) }}"
                                 {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
-                        <option value="{{ route('frontend.our-products', ['sort' => 'name'] + request()->except('sort')) }}"
+                        <option value="{{ route('frontend.our-products', array_merge(request()->except('sort'), ['sort' => 'name'])) }}"
                                 {{ request('sort') == 'name' ? 'selected' : '' }}>Name A-Z</option>
-                        <option value="{{ route('frontend.our-products', ['sort' => 'newest'] + request()->except('sort')) }}"
+                        <option value="{{ route('frontend.our-products', array_merge(request()->except('sort'), ['sort' => 'newest'])) }}"
                                 {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
                     </select>
                 </div>
@@ -99,7 +99,7 @@
                                         <a href="#" class="btn btn-outline-gawis w-100 view-details-btn" 
                                             data-product-name="{{ $product->name }}"
                                             data-product-short-description="{{ $product->short_description }}"
-                                            data-unilevel-settings='{{ json_encode($product->unilevelSettings) }}'>View Details</a>
+                                            data-unilevel-settings='@json($product->unilevelSettings)'>View Details</a>
                                     </div>
                                     @endif
                                 </div>
@@ -235,6 +235,7 @@
             </div>
         </div>
     </div>
+@endsection
 
 @push('scripts')
 <script>
