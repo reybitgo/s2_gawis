@@ -92,7 +92,7 @@
                     <!-- Contact Us Image Start -->
                     <div class="contact-us-image">
                         <figure>
-                            <img src="{{ asset('frontend/images/about-img-2.png') }}" alt="" />
+                            <img src="{{ asset('frontend/images/about-img-3.png') }}" alt="" />
                         </figure>
                     </div>
                     <!-- Contact Us Image End -->
