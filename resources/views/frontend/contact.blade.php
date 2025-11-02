@@ -78,8 +78,8 @@
                                 <img src="{{ asset('frontend/images/icon-location.svg') }}" alt="" />
                             </div>
                             <div class="contact-info-content">
-                                <p>location</p>
-                                <h3><small>{{ $adminUser->address }}{{ $adminUser->city ? ', ' . $adminUser->city : '' }}, Philippines</small></h3>
+                                <p>location</p>                                
+                                <h3><small>{{ $adminUser->address }}{{ $adminUser->city ? ', ' . $adminUser->city : '' }}{{ $adminUser->state ? ', ' . $adminUser->state : '' }}, Philippines {{ $adminUser->zip ? ' ' . $adminUser->zip : '' }}</small></h3>
                             </div>
                         </div>
                         <!-- Contact Info Item End -->
