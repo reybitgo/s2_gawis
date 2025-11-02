@@ -49,5 +49,15 @@ class SystemSettingSeeder extends Seeder
                 'Currency symbol to display (₱, $, €, etc.)'
             );
         }
+
+        // Fraud protection setting
+        if (!SystemSetting::where('key', 'fraud_protection_enabled')->exists()) {
+            SystemSetting::set(
+                'fraud_protection_enabled',
+                true,
+                'boolean',
+                'Enable or disable the fraud protection system for checkouts.'
+            );
+        }
     }
 }

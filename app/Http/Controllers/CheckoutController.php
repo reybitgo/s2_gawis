@@ -11,6 +11,7 @@ use App\Services\FraudDetectionService;
 use App\Jobs\ProcessMLMCommissions;
 use App\Jobs\ProcessUnilevelBonusesJob;
 use App\Models\Product;
+use App\Models\SystemSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -139,13 +140,15 @@ class CheckoutController extends Controller
         }
 
         // Fraud Detection: Check if order should be blocked
-        if ($this->fraudDetectionService->shouldBlockOrder(Auth::user(), $request->ip())) {
-            Log::critical('Blocked order attempt from suspicious user/IP', [
-                'user_id' => Auth::id(),
-                'ip' => $request->ip()
-            ]);
-            return redirect()->route('dashboard')
-                ->with('error', 'Your order cannot be processed at this time. Please contact support.');
+        if (SystemSetting::get('fraud_protection_enabled', true)) {
+            if ($this->fraudDetectionService->shouldBlockOrder(Auth::user(), $request->ip())) {
+                Log::critical('Blocked order attempt from suspicious user/IP', [
+                    'user_id' => Auth::id(),
+                    'ip' => $request->ip()
+                ]);
+                return redirect()->route('dashboard')
+                    ->with('error', 'Your order cannot be processed at this time. Please contact support.');
+            }
         }
 
         $cartSummary = $this->cartService->getSummary();
@@ -157,46 +160,48 @@ class CheckoutController extends Controller
         }
 
         // Fraud Detection: Check velocity and patterns
-        $velocityCheck = $this->fraudDetectionService->checkVelocity(Auth::user(), $request->ip());
-        $ipCheck = $this->fraudDetectionService->checkIpReputation($request->ip());
-        $patternCheck = $this->fraudDetectionService->checkOrderPattern([
-            'total_amount' => $cartSummary['total']
-        ], Auth::user());
+        if (SystemSetting::get('fraud_protection_enabled', true)) {
+            $velocityCheck = $this->fraudDetectionService->checkVelocity(Auth::user(), $request->ip());
+            $ipCheck = $this->fraudDetectionService->checkIpReputation($request->ip());
+            $patternCheck = $this->fraudDetectionService->checkOrderPattern([
+                'total_amount' => $cartSummary['total']
+            ], Auth::user());
 
-        // Calculate combined risk score
-        $totalRiskScore = $velocityCheck['risk_score'] +
-                         ($ipCheck['is_suspicious'] ? 20 : 0) +
-                         ($patternCheck['is_suspicious'] ? 15 : 0);
+            // Calculate combined risk score
+            $totalRiskScore = $velocityCheck['risk_score'] +
+                             ($ipCheck['is_suspicious'] ? 20 : 0) +
+                             ($patternCheck['is_suspicious'] ? 15 : 0);
 
-        // Block if risk score is very high
-        if ($totalRiskScore >= 70) {
-            $this->fraudDetectionService->logSuspiciousActivity(
-                Auth::user(),
-                'high_risk_checkout_attempt',
-                [
-                    'risk_score' => $totalRiskScore,
-                    'velocity_issues' => $velocityCheck['issues'],
-                    'ip_issues' => $ipCheck['issues'],
-                    'pattern_issues' => $patternCheck['issues'],
-                    'cart_total' => $cartSummary['total']
-                ]
-            );
+            // Block if risk score is very high
+            if ($totalRiskScore >= 70) {
+                $this->fraudDetectionService->logSuspiciousActivity(
+                    Auth::user(),
+                    'high_risk_checkout_attempt',
+                    [
+                        'risk_score' => $totalRiskScore,
+                        'velocity_issues' => $velocityCheck['issues'],
+                        'ip_issues' => $ipCheck['issues'],
+                        'pattern_issues' => $patternCheck['issues'],
+                        'cart_total' => $cartSummary['total']
+                    ]
+                );
 
-            return redirect()->route('dashboard')
-                ->with('error', 'Your order has been flagged for review. Our team will contact you shortly.');
-        }
+                return redirect()->route('dashboard')
+                    ->with('error', 'Your order has been flagged for review. Our team will contact you shortly.');
+            }
 
-        // Log suspicious but not blocking activity
-        if ($totalRiskScore >= 40) {
-            $this->fraudDetectionService->logSuspiciousActivity(
-                Auth::user(),
-                'moderate_risk_checkout',
-                [
-                    'risk_score' => $totalRiskScore,
-                    'velocity_issues' => $velocityCheck['issues'],
-                    'ip_issues' => $ipCheck['issues']
-                ]
-            );
+            // Log suspicious but not blocking activity
+            if ($totalRiskScore >= 40) {
+                $this->fraudDetectionService->logSuspiciousActivity(
+                    Auth::user(),
+                    'moderate_risk_checkout',
+                    [
+                        'risk_score' => $totalRiskScore,
+                        'velocity_issues' => $velocityCheck['issues'],
+                        'ip_issues' => $ipCheck['issues']
+                    ]
+                );
+            }
         }
 
         // Validate cart items one more time

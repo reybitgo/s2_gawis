@@ -987,6 +987,7 @@ class AdminController extends Controller
         $request->validate([
             'email_verification_enabled' => 'boolean',
             'require_2fa' => 'boolean',
+            'fraud_protection_enabled' => 'boolean',
             'maintenance_mode' => 'boolean',
             'session_timeout' => 'boolean',
             'session_timeout_minutes' => 'integer|min:5|max:1440',
@@ -1065,6 +1066,9 @@ class AdminController extends Controller
         }
         if ($request->has('require_2fa')) {
             \App\Models\SystemSetting::set('require_2fa', $request->boolean('require_2fa'), 'boolean', 'Require two-factor authentication for all users');
+        }
+        if ($request->has('fraud_protection_enabled')) {
+            \App\Models\SystemSetting::set('fraud_protection_enabled', $request->boolean('fraud_protection_enabled'), 'boolean', 'Enable or disable the fraud protection system for checkouts.');
         }
         if ($request->has('session_timeout')) {
             \App\Models\SystemSetting::set('session_timeout', $request->boolean('session_timeout'), 'boolean', 'Enable automatic session timeout');

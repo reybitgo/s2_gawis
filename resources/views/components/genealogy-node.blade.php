@@ -1,6 +1,5 @@
 @props([
     'member',
-    'earningsLabel' => 'Earnings',
 ])
 
 <li class="genealogy-node">
@@ -17,7 +16,6 @@
         </div>
         <div class="node-stats">
             <div class="node-level">Level {{ $member->level }}</div>
-            <div class="node-earnings">{{ $earningsLabel }}: <span class="earnings-amount">{{ currency($member->earnings) }}</span></div>
             <div class="node-status status-{{ $member->status }}">{{ ucfirst($member->status) }}</div>
         </div>
         @if(!empty($member->children))
@@ -35,7 +33,7 @@
     @if (!empty($member->children))
         <ul class="genealogy-level" style="display: none;">
             @foreach ($member->children as $child)
-                <x-genealogy-node :member="$child" :earnings-label="$earningsLabel" />
+                <x-genealogy-node :member="$child" />
             @endforeach
         </ul>
     @endif
@@ -103,13 +101,10 @@
         margin-left: 20px;
         flex-shrink: 0; /* Prevent stats from shrinking */
     }
-    .node-level, .node-earnings, .node-status {
+    .node-level, .node-status {
         font-size: 0.85rem;
     }
-    .earnings-amount {
-        font-weight: bold;
-        color: #28a745;
-    }
+
     .node-status {
         font-weight: 500;
         padding: 2px 8px;

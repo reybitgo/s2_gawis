@@ -273,6 +273,14 @@
                                 </label>
                             </div>
                             <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="fraud_protection_enabled" name="fraud_protection_enabled"
+                                    {{ isset($settings['fraud_protection_enabled']) && $settings['fraud_protection_enabled']->value ? 'checked' : '' }}>
+                                <label class="form-check-label" for="fraud_protection_enabled">
+                                    <strong>Enable Fraud Protection</strong>
+                                    <div class="text-body-secondary small">Enable or disable the fraud protection system for checkouts.</div>
+                                </label>
+                            </div>
+                            <div class="form-check mb-3">
                                 <input class="form-check-input" type="checkbox" id="session_timeout" name="session_timeout"
                                     {{ isset($settings['session_timeout']) && $settings['session_timeout']->value ? 'checked' : 'checked' }}>
                                 <label class="form-check-label" for="session_timeout">
@@ -789,6 +797,7 @@ function saveSettings(category) {
         // Get security settings values
         const emailVerificationEnabled = document.getElementById('email_verification_enabled').checked;
         const require2fa = document.getElementById('require_2fa').checked;
+        const fraudProtectionEnabled = document.getElementById('fraud_protection_enabled').checked;
         const sessionTimeout = document.getElementById('session_timeout').checked;
         const sessionTimeoutMinutes = parseInt(document.getElementById('session_timeout_minutes').value) || 15;
         const maxLoginAttempts = parseInt(document.getElementById('max_login_attempts').value) || 3;
@@ -804,6 +813,7 @@ function saveSettings(category) {
             body: JSON.stringify({
                 email_verification_enabled: emailVerificationEnabled,
                 require_2fa: require2fa,
+                fraud_protection_enabled: fraudProtectionEnabled,
                 session_timeout: sessionTimeout,
                 session_timeout_minutes: sessionTimeoutMinutes,
                 max_login_attempts: maxLoginAttempts,
